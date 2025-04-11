@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  color-scheme: dark;
 }
 
 .container {
@@ -11,6 +12,7 @@
 }
 
 .rainbow-text {
+  user-select: none;
   font-size: 64px;
   background: linear-gradient(270deg,
       #ff0000,
