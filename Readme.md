@@ -68,11 +68,10 @@ Go01 是一个基于 Go 的后端项目框架，旨在提供高效、简洁的�
 
 ```
 go01/
-├── cmd/            # 命令行相关代码
-├── internal/       # 内部逻辑
-├── pkg/            # 可复用的包
-├── configs/        # 配置文件
-├── main.go         # 主入口
+├── webserver/          # 后端服务
+├── public/             # web 工程
+├── ├── front-end/      # 前端框架
+├── main.go             # 主入口
 ```
 
 ## 贡献
