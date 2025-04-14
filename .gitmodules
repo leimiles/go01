@@ -1,0 +1,3 @@
+[submodule "webserver/public"]
+	path = webserver/public
+	url = git@git.sofunny.io:graphics/game-ripping/sofunny-3d.git
