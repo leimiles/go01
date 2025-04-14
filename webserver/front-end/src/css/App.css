@@ -12,54 +12,6 @@
   margin-top: 100px;
 }
 
-.rainbow-text {
-  user-select: none;
-  font-size: 64px;
-  background: linear-gradient(270deg,
-      #ff0000,
-      #ff9900,
-      #33cc33,
-      #3399ff,
-      #9900cc,
-      #ff0000);
-  background-size: 1200% 1200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation:
-    rainbow 8s linear infinite,
-    breath 3s ease-in-out infinite;
-}
-
-@keyframes rainbow {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes breath {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-
-}
-
 .logo {
   height: 6em;
   padding: 1.5em;
