@@ -9,7 +9,7 @@ export default function ModelViewer() {
             <Canvas className="modelviewer-canvas">
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[10, 10, 5]} intensity={1} />
-                <Model modelUrl="../models/Bear.fbx" animationUrl="../models/Bear@idle.fbx" />
+                <Model modelUrl="../models/Bear.fbx" rotation={[-Math.PI / 2, 0, 0]} animationUrl="../models/Bear@idle.fbx" />
                 <OrbitControls enableZoom={false} enablePan={false} />
             </Canvas>
         </div>

@@ -4,7 +4,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { AnimationMixer } from 'three'
 import * as THREE from 'three'
 
-export default function Model({ modelUrl, animationUrl }) {
+export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) {
     const group = useRef()
     const mixer = useRef()
     const meshRef = useRef()
@@ -19,6 +19,8 @@ export default function Model({ modelUrl, animationUrl }) {
                     meshRef.current = child
                 }
             })
+
+            object.rotation.set(rotation[0], rotation[1], rotation[2])
             group.current.add(object)
         })
 
@@ -33,7 +35,7 @@ export default function Model({ modelUrl, animationUrl }) {
                 }
             })
         }
-    }, [modelUrl, animationUrl])
+    }, [modelUrl, animationUrl, rotation])
 
     useFrame((state, delta) => {
         if (mixer.current) mixer.current.update(delta)
