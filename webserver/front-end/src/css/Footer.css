@@ -1,0 +1,26 @@
+/* Footer 样式 */
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding: 1rem;
+    background-color: #1a1a1a;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-top: 1px solid #333;
+    z-index: 10;
+}
+
+/* 图标样式 */
+.footer-icon {
+    width: 40px;
+    height: 40px;
+    transition: transform 0.3s;
+}
+
+.footer-icon:hover {
+    transform: scale(1.2);
+}
