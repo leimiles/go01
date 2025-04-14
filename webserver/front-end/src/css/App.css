@@ -1,15 +1,13 @@
-#root {
-  max-width: 1280px;
+#root,
+body {
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
-  /* background-color: #242424; */
+  background-color: #242424;
   color-scheme: dark;
 }
 
 .container {
   text-align: center;
-  margin-top: 100px;
 }
 
 .logo {
