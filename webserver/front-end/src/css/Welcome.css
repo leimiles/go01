@@ -1,5 +1,6 @@
 .rainbow-text {
     user-select: none;
+    font-family: 'Comic Sans MS', 'ZCOOL Kuaile', sans-serif;
     font-size: 64px;
     background: linear-gradient(270deg,
             #ff0000,
@@ -44,4 +45,12 @@
         transform: scale(1);
     }
 
+}
+
+.en {
+    font-family: 'Comic Sans MS', cursive;
+}
+
+.zh {
+    font-family: 'Microsoft YaHei', sans-serif;
 }

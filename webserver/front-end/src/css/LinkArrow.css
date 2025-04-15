@@ -1,0 +1,29 @@
+.svg-arrow-link {
+    display: inline-block;
+    margin-left: 1rem;
+    transition: transform 0.2s ease, filter 0.3s ease;
+    animation: arrow-float 2s ease-in-out infinite;
+}
+
+.svg-arrow-link:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 6px #ffcc00);
+}
+
+.arrow-icon {
+    vertical-align: middle;
+}
+
+@keyframes arrow-float {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
