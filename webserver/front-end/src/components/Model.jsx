@@ -4,9 +4,11 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { TGALoader } from 'three/examples/jsm/loaders/TGALoader'
 import { AnimationMixer } from 'three'
 import { MeshStandardMaterial } from 'three'
+import { BoxHelper } from 'three'
+
 import * as THREE from 'three'
 
-export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) {
+export default function Model({ modelUrl, animationUrl, onLoaded }) {
     const group = useRef()
     const mixer = useRef()
     const modelRoot = useRef()
@@ -39,17 +41,26 @@ export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) 
         loader.load(modelUrl, (object) => {
             object.traverse((child) => {
                 if (child.isMesh) {
-                    child.material = new MeshStandardMaterial({ color: 'white' })
+                    //child.material = new MeshStandardMaterial({ color: 'white' })
+                    console.log('child:', child.name)
+                    console.log('child material:', child.material.name)
                 }
             })
 
-            // const { box, size, center } = analyzeBoundingBox(object)
-            // console.log('模型大小:', size)
-            // console.log('模型中心:', center)
+            // console.log('root rotation:', object.rotation)
+            // console.log('position:', object.position)
+            // console.log('up:', object.up)  // 默认是 Y 向上
 
-            object.rotation.set(...rotation)
+            const { box, size, center } = analyzeBoundingBox(object)
             group.current.add(object)
+
+            const helper = new BoxHelper(object, 0xffff00)
+            group.current.add(helper)
+
             modelRoot.current = object
+
+            //通知外部（ModelViewer）中心点
+            //onLoaded?.(center)
         }, undefined, (error) => {
             console.error("模型加载失败：", error)
         })
@@ -74,14 +85,14 @@ export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) 
         return () => {
             if (mixer.current) mixer.current.stopAllAction()
         }
-    }, [modelUrl, animationUrl, rotation])
+    }, [modelUrl, animationUrl])
 
     useFrame((_, delta) => {
         if (mixer.current) mixer.current.update(delta)
     })
 
     return (
-        <group ref={group} position={[0, -1, 0]} scale={[0.01, 0.01, 0.01]} />
+        <group ref={group} position={[0, 0, 0]} scale={[1, 1, 1]} />
     )
 }
 
