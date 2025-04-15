@@ -43,6 +43,10 @@ export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) 
                 }
             })
 
+            // const { box, size, center } = analyzeBoundingBox(object)
+            // console.log('模型大小:', size)
+            // console.log('模型中心:', center)
+
             object.rotation.set(...rotation)
             group.current.add(object)
             modelRoot.current = object
@@ -79,4 +83,13 @@ export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) 
     return (
         <group ref={group} position={[0, -1, 0]} scale={[0.01, 0.01, 0.01]} />
     )
+}
+
+function analyzeBoundingBox(object3d) {
+    const box = new THREE.Box3().setFromObject(object3d)
+    const size = new THREE.Vector3()
+    const center = new THREE.Vector3()
+    box.getSize(size)
+    box.getCenter(center)
+    return { box, size, center }
 }
