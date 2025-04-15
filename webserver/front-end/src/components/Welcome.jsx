@@ -3,9 +3,9 @@ import LinkArrow from './LinkArrow'
 
 function Welcome() {
     return (
-        <h1 class="rainbow-text">
-            <span class="zh">你好!</span>
-            <span class="en"> Sofunny 3D</span>
+        <h1 className="rainbow-text">
+            <span className="zh">你好!</span>
+            <span className="en"> Sofunny 3D</span>
             <span><LinkArrow /></span>
         </h1>
 
