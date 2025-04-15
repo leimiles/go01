@@ -1,8 +1,8 @@
 import { useState, lazy, Suspense } from 'react'
-import './css/App.css'
-import Footer from './components/Footer'
-import Welcome from './components/Welcome'
-const ModelViewer = lazy(() => import('./components/ModelViewer'))
+import '../css/App.css'
+import Footer from './Footer'
+import Welcome from './Welcome'
+const ModelViewer = lazy(() => import('./ModelViewer'))
 
 function App() {
   return (
