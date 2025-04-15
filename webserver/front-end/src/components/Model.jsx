@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { TGALoader } from 'three/examples/jsm/loaders/TGALoader'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { AnimationMixer } from 'three'
 import * as THREE from 'three'
@@ -11,6 +12,8 @@ export default function Model({ modelUrl, animationUrl, rotation = [0, 0, 0] }) 
 
     useEffect(() => {
         const loader = new FBXLoader()
+        loader.setPath('/models/')
+        loader.manager.addHandler(/\.tga$/i, new TGALoader())
 
         loader.load(modelUrl, (object) => {
             object.traverse((child) => {
