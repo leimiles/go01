@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import { TGALoader } from 'three/examples/jsm/loaders/TGALoader'
 import { AnimationMixer } from 'three'
-import { MeshStandardMaterial } from 'three'
+// import { MeshStandardMaterial } from 'three'
+import { SkeletonHelper } from 'three'
 import { BoxHelper } from 'three'
 
 import * as THREE from 'three'
@@ -39,13 +40,29 @@ export default function Model({ modelUrl, animationUrl, onLoaded }) {
 
         // Step 1: 加载模型
         loader.load(modelUrl, (object) => {
+
             object.traverse((child) => {
                 if (child.isMesh) {
                     //child.material = new MeshStandardMaterial({ color: 'white' })
-                    console.log('child:', child.name)
-                    console.log('child material:', child.material.name)
+                    // console.log('child:', child.name)
+                    // console.log('child material:', child.material.name)
+                    // if (child.isSkinnedMesh) {
+                    //     console.log('child:', child.name + ' isSkinnedMesh')
+                    //     child.material.skinning = true
+                    // }
+                }
+
+                //console.log('[traverse] child:', child.name, ' | ', child.type)
+
+                if (child.isBone) {
+                    //console.log('child:', child.name + ' bone')
+                    const skeletonHelper = new SkeletonHelper(child)
+                    skeletonHelper.visible = true
+                    group.current.add(skeletonHelper)
                 }
             })
+            // console.log('object up:', object.up)
+            // object.rotation.set(-Math.PI / 2, 0, 0)
 
             // console.log('root rotation:', object.rotation)
             // console.log('position:', object.position)
