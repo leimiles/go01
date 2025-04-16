@@ -42,7 +42,7 @@ Go01 是一个基于 Go 的后端项目框架，旨在提供高效、简洁的�
     ```
 2. 清空 webserver 下 public 文件夹中的内容，将前端工程下的 public 内容复制过去
     ```
-    rm ../public/*
+    rm -rf ../public/*
     cp -r dist/* ../public/
     ```
 
@@ -56,7 +56,8 @@ Go01 是一个基于 Go 的后端项目框架，旨在提供高效、简洁的�
 
 2. 安装依赖：
     ```bash
-    go mod tidy
+    npm install three @react-three/fiber @react-three/drei
+    npm install react-router-dom
     ```
 
 3. 运行项目：
