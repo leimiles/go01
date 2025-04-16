@@ -26,4 +26,3 @@ go.work.sum
 .DS_Store
 webserver/public
 webserver/front-end/package-lock.json
-webserver/public
