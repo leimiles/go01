@@ -1,6 +1,7 @@
-# Go01 Framework
+# assets-3d
 
-Go01 是一个基于 Go + React + Three.js 的 web 框架，旨在提供对司内资产库的访问，预览，下载，标签与整理。
+assets-3d 是一个基于 Go + React + Three.js 的项目框架，旨在提供对司内资产库的访问，预览，下载，标签与整理
+- [项目介绍](https://sofunny.feishu.cn/docx/YaGBd5gFpovgV6xIB0ScEBF8nnh)
 
 ## 特性
 - 数据增改，通过前端页面提交数字资产的源文件，设置或修改标签，资产以数据单元形式存储在网盘上
@@ -56,7 +57,7 @@ Go01 是一个基于 Go + React + Three.js 的 web 框架，旨在提供对司�
 
 1. 克隆项目：
     ```bash
-    git clone https://github.com/your-repo/go01.git
+    git clone git@git.sofunny.io:graphics/game-ripping/assets-3d.git
     cd go01
     ```
 
