@@ -1,6 +1,6 @@
 import { AnimationMixer } from 'three'
 
-export default class AnimationManager {
+export default class AnimationController {
     constructor(modelRoot, onDuration = () => { }) {
         this.mixer = new AnimationMixer(modelRoot);
         this.actions = new Map()
