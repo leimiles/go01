@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { AxesHelper } from 'three'
 import Model from '../models/Model'
 import AnimationController from '../controllers/AnimationController'
@@ -26,12 +26,12 @@ export default function ModelViewer({
                 requestAnimationFrame(waitForGroup)
                 return
             }
-            if(isLoadedRef.current) return
+            if (isLoadedRef.current) return
             isLoadedRef.current = true
             const loadAssets = async () => {
                 try {
 
-                    const { model } = await modelRef.current.loadModel(modelUrl )
+                    const { model } = await modelRef.current.loadModel(modelUrl)
                     groupRef.current.add(model)
 
                     // 初始化动画管理器
@@ -74,6 +74,13 @@ export default function ModelViewer({
         <div className="modelviewer-container">
 
             <Canvas className="modelviewer-canvas">
+                <PerspectiveCamera
+                    makeDefault
+                    position={[0, 200, 500]}
+                    fov={45}
+                    near={0.1}
+                    far={1000}
+                />
                 <ambientLight intensity={5} />
                 <directionalLight position={[-10, -10, 5]} intensity={10} />
                 <group ref={groupRef} position={[0, 0, 0]} scale={[1, 1, 1]} />
