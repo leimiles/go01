@@ -1,20 +1,70 @@
 .modelviewer-container {
     width: 100%;
-    height: 40vh;
-    /* 高度自己可以调 */
+    aspect-ratio: 16/9;
+    max-height: 80vh;
     position: relative;
-    background-color: transparent;
-    /* 背景透明 */
-    pointer-events: none;
-    /* 允许鼠标点击穿透到下面（比如文字按钮） */
     overflow: hidden;
-    z-index: 1;
-    /* 确保在文字之上或下面，按需求调整 */
+    background: #1a1a1a;
+    font-size: 14px;
+    line-height: 1.4;
+    box-sizing: border-box;
+    color: #e0e0e0;
 }
 
+/* Three.js画布 */
 .modelviewer-canvas {
     width: 100%;
     height: 100%;
-    background-color: transparent !important;
-    /* 强制Canvas背景透明 */
+    background: #2a2a2a;
+    pointer-events: auto;
+}
+
+/* 顶部控制栏 */
+.top-control-bar {
+    display: flex;
+    align-items: center;
+    padding: 1px 2px;
+    height: 24px;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #404040;
+}
+
+.settings-button, .download-button, .close-button {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e0e0e0;
+    font-size: 16px;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.settings-button:hover, .download-button:hover {
+    color: #ffffff;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+/* 关闭按钮 */
+.close-button {
+    color: #e0e0e0;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.close-button:hover {
+    color: #ff5555;
 }
