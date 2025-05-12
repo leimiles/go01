@@ -25,6 +25,9 @@ export default class Model {
         switch (ext) {
             case 'fbx': return FBXLoader
             case 'obj': return OBJLoader
+            case 'glb':
+            case 'gltf':
+                return GLTFLoader
             default: throw new Error(`Unsupported format: ${ext}`)
         }
     }
@@ -37,6 +40,11 @@ export default class Model {
         if (ext === 'obj') {
             const materials = await this.loadMTL(url)
             return await this.loadWithObjLoader(url, materials)
+        }
+
+        // GLTF/GLB加载
+        if (ext === 'gltf' || ext === 'glb') {
+            return this.loadWithGLTFLoader(url)
         }
 
         // FBX加载
@@ -73,6 +81,17 @@ export default class Model {
         return { model: object }
     }
 
+    // GLTF/GLB加载
+    async loadWithGLTFLoader(url) {
+        const gltfLoader = new GLTFLoader()
+        gltfLoader.setPath(this.loaderSettings.path)
+        const gltf = await new Promise((resolve, reject) => {
+            gltfLoader.load(url, resolve, undefined, reject)
+        })
+        this.postProcessModel(gltf.scene)
+        return { model: gltf.scene }
+    }
+
     // FBX加载
     async loadWithFbxLoader(url) {
         const fbxLoader = new FBXLoader()
@@ -95,8 +114,23 @@ export default class Model {
         this.modelRoot = object
     }
 
+    // 加载GLTF/GLB动画
+    async loadGLTFAnimation(url) {
+        const gltfLoader = new GLTFLoader()
+        gltfLoader.setPath(this.loaderSettings.path)
+        const gltf = await new Promise((resolve, reject) => {
+            gltfLoader.load(url, resolve, undefined, reject)
+        })
+
+        return gltf.animations || []
+    }
+
     // 加载动画
     async loadAnimation(url) {
+        const ext = url.split('.').pop().toLowerCase()
+        if (ext === 'gltf' || ext === 'glb') {
+            return this.loadGLTFAnimation(url)
+        }
         const loader = new FBXLoader()
         loader.setPath(this.loaderSettings.path)
         return new Promise((resolve, reject) => {
