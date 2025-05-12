@@ -28,6 +28,8 @@ export default class Model {
         loader.manager.addHandler(/\.tga$/i, new TGALoader())
         return new Promise((resolve, reject) => {
             loader.load(url, (object) => {
+                // 如果没有贴图或材质就给一个默认的灰色材质
+                this.fixMaterials(object)
                 this.modelRoot = object
                 resolve({
                     model: object,
@@ -46,6 +48,38 @@ export default class Model {
                 const clips = animData.animations || []
                 resolve(clips)
             }, undefined, reject)
+        })
+    }
+
+    // 修复材质
+    fixMaterials(object) {
+        object.traverse(child => {
+            if (child.isMesh) {
+                if (child.material) {
+                    const materials = Array.isArray(child.material)
+                        ? child.material
+                        : [child.material]
+
+                    materials.forEach(mat => {
+                        // 检查贴图是否加载失败，如果没有贴图则设置为默认灰色材质
+                        if (!mat.map?.image) {
+                            child.material = new THREE.MeshStandardMaterial({
+                                color: 0x888888,
+                                roughness: 0.7,
+                                metalness: 0.1
+                            })
+
+                        }
+                    })
+                } else {
+                    // 无材质时也设置为默认灰色材质
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0x888888,
+                        roughness: 0.7,
+                        metalness: 0.1
+                    })
+                }
+            }
         })
     }
 
