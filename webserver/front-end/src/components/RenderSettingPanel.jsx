@@ -35,7 +35,7 @@ export default function RenderSettingPanel({
                 <input
                     type="checkbox"
                     checked={renderMode === 'wireframe'}
-                    onChange={(e) => onRenderModeChange(e.target.checked ? 'wireframe' : wireframeColor ? 'mesh+wireframe' : 'normal')}
+                    onChange={(e) => onRenderModeChange(e.target.checked ? 'wireframe' : 'mesh+wireframe')}
                 />
                 仅线框
             </label>

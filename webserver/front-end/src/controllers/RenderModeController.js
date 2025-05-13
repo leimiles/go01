@@ -5,7 +5,6 @@ export default class RenderModeController {
         this.modelRoot = model
         this.originalMaterials = new Map()
         this.wireframeColor = null
-        this.grayMaterial = null
     }
     // 初始化保存原始材质
     cacheOriginalMaterials() {
@@ -27,7 +26,7 @@ export default class RenderModeController {
                 if (!originalMaterial) return
 
                 // 如果没有线框颜色，清除线框网格
-                if (this.wireframeColor === null || this.wireframeColor === undefined) {
+                if (this.wireframeColor === null || this.wireframeColor === undefined || mode === 'wireframe') {
                     if (child.userData.wireframeMesh) {
                         child.remove(child.userData.wireframeMesh)
                         child.userData.wireframeMesh.material.dispose()
@@ -41,7 +40,7 @@ export default class RenderModeController {
                 }
                 // 如果线框网格不存在，且需要线框模式，则创建
                 else if (
-                    (mode === 'wireframe' || mode === 'mesh+wireframe') &&
+                    (mode === 'mesh+wireframe') &&
                     this.wireframeColor !== null
                 ) {
                     this.createWireframeMesh(child)
@@ -50,10 +49,14 @@ export default class RenderModeController {
                 // 处理主材质的切换
                 switch (mode) {
                     case 'wireframe':
-                        if (!this.grayMaterial) {
-                            this.grayMaterial = new THREE.MeshBasicMaterial({ color: 0xB0C4DE })
+                        if (!child.geometry.attributes.aBarycentric) {
+                            addBarycentricCoordinates(child.geometry)
                         }
-                        child.material = this.grayMaterial
+                        // 主材质替换为支持骨骼的线框 Shader
+                        child.material = createWireframeShaderMaterial(
+                            this.wireframeColor,
+                            child.isSkinnedMesh
+                        )
                         break
 
                     case 'mesh+wireframe':
@@ -97,10 +100,76 @@ export default class RenderModeController {
                 delete child.userData.wireframeMesh
             }
         })
-
-        if (this.grayMaterial) {
-            this.grayMaterial.dispose()
-            this.grayMaterial = null
-        }
     }
+}
+
+function addBarycentricCoordinates(geometry) {
+    const count = geometry.attributes.position.count
+    const bary = []
+
+    for (let i = 0; i < count; i += 3) {
+        bary.push(1, 0, 0)
+        bary.push(0, 1, 0)
+        bary.push(0, 0, 1)
+    }
+    geometry.setAttribute('aBarycentric', new THREE.Float32BufferAttribute(bary, 3))
+}
+
+function createWireframeShaderMaterial(colorHex, isSkinnedMesh = false) {
+    const defaultColor = 0x808080
+    const finalColor = colorHex ?? defaultColor
+
+    const defines = {}
+    if (isSkinnedMesh) {
+        defines.USE_SKINNING = '' // 启用骨骼动画支持
+    }
+    return new THREE.ShaderMaterial({
+        defines,
+        // 顶点着色器：skinning + barycentric
+        vertexShader: `
+            attribute vec3 aBarycentric;
+            varying vec3 vBarycentric;
+            vec3 transformed;
+
+            #include <common>
+            ${isSkinnedMesh ? '#include <skinning_pars_vertex>' : ''}
+
+            void main() {
+                vBarycentric = aBarycentric;
+                transformed = position;
+                ${isSkinnedMesh ?
+                '#include <skinbase_vertex>\n#include <skinning_vertex>' :
+                '#include <begin_vertex>'
+            }
+                #include <project_vertex>
+            }
+        `,
+        // 片元着色器：只渲染正面线条
+        fragmentShader: `
+            varying vec3 vBarycentric;
+            uniform vec3 uColor;
+            uniform float uLineWidth;
+
+            // 计算每个片元离三角形边界的距离
+            float edgeFactor() {
+                vec3 d = fwidth(vBarycentric);
+                vec3 a3 = smoothstep(vec3(0.0), d * uLineWidth, vBarycentric);
+                return min(min(a3.x, a3.y), a3.z);
+            }
+
+            void main() {
+                if (!gl_FrontFacing) discard;
+                float edge = edgeFactor();
+                // 线框部分不透明，面内区域透明
+                gl_FragColor = vec4(uColor, 1.0 - edge);
+            }
+        `,
+        uniforms: {
+            uColor: { value: new THREE.Color(finalColor) },
+            uLineWidth: { value: 1.0 }
+        },
+        transparent: true,
+        depthTest: false,
+        depthWrite: false
+    })
 }
