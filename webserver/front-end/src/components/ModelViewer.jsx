@@ -4,6 +4,8 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { AxesHelper } from 'three'
 import Model from '../models/Model'
+import RenderModeController from '../controllers/RenderModeController'
+import RenderSettingPanel from './RenderSettingPanel'
 import AnimationController from '../controllers/AnimationController'
 import '../css/ModelViewer.css'
 
@@ -14,8 +16,12 @@ export default function ModelViewer({
     const controlsRef = useRef()
     const modelRef = useRef(new Model())
     const groupRef = useRef()
+    const renderModeControllerRef = useRef()
     const animationManagerRef = useRef()
     const [isModelReady, setIsModelReady] = useState(false)
+    const [renderMode, setRenderMode] = useState('mesh+wireframe')
+    const [wireframeColor, setWireframeColor] = useState(null)
+    const [showRenderSettings, setShowRenderSettings] = useState(false)
     const [selectedAnimationFile, setSelectedAnimationFile] = useState(animationUrls[0])
     const isLoadedRef = useRef(false)
 
@@ -34,6 +40,12 @@ export default function ModelViewer({
                     const { model } = await modelRef.current.loadModel(modelUrl)
                     groupRef.current.add(model)
 
+                    // 初始化渲染模式控制器
+                    renderModeControllerRef.current = new RenderModeController(model)
+                    renderModeControllerRef.current.cacheOriginalMaterials()
+                    renderModeControllerRef.current.setRenderMode(renderMode)
+                    renderModeControllerRef.current.setWireframeColor(wireframeColor)
+
                     // 初始化动画管理器
                     animationManagerRef.current = new AnimationController(model)
 
@@ -48,6 +60,7 @@ export default function ModelViewer({
         waitForGroup()
         return () => {
             animationManagerRef.current?.dispose()
+            renderModeControllerRef.current?.dispose()
         }
     }, [])
 
@@ -63,12 +76,18 @@ export default function ModelViewer({
                     animationManagerRef.current.playAnimation(clips[0].name)
                 }
             } catch (err) {
-                console.error("动画加载失败:", err);
+                console.error("动画加载失败:", err)
             }
         }
 
         loadAnim()
     }, [selectedAnimationFile, isModelReady])
+
+    // 响应渲染模式变化
+    useEffect(() => {
+        renderModeControllerRef.current?.setWireframeColor(wireframeColor)
+        renderModeControllerRef.current?.setRenderMode(renderMode)
+    }, [wireframeColor, renderMode])
 
     return (
         <div className="modelviewer-container">
@@ -76,6 +95,7 @@ export default function ModelViewer({
             <div className="top-control-bar">
                 <button
                     className="settings-button"
+                    onClick={() => setShowRenderSettings(!showRenderSettings)}
                     title="渲染设置"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -90,6 +110,18 @@ export default function ModelViewer({
                 </button>
                 <button className="close-button">×</button>
             </div>
+            {/* 渲染设置侧边栏 */}
+            {showRenderSettings && (
+                <RenderSettingPanel
+                    wireframeColor={wireframeColor}
+                    renderMode={renderMode}
+                    onColorSelect={(opt) => {
+                        setWireframeColor(opt.hex)
+                        setRenderMode(renderMode)
+                    }}
+                    onRenderModeChange={setRenderMode}
+                />
+            )}
             <Canvas className="modelviewer-canvas">
                 <PerspectiveCamera
                     makeDefault
