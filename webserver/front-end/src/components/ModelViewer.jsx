@@ -19,6 +19,8 @@ export default function ModelViewer({
     const renderModeControllerRef = useRef()
     const animationManagerRef = useRef()
     const [isModelReady, setIsModelReady] = useState(false)
+    const [skeletonVisible, setSkeletonVisible] = useState(false)
+    const [modelVisible, setModelVisible] = useState(true)
     const [renderMode, setRenderMode] = useState('mesh+wireframe')
     const [wireframeColor, setWireframeColor] = useState(null)
     const [showRenderSettings, setShowRenderSettings] = useState(false)
@@ -45,6 +47,8 @@ export default function ModelViewer({
                     renderModeControllerRef.current.cacheOriginalMaterials()
                     renderModeControllerRef.current.setRenderMode(renderMode)
                     renderModeControllerRef.current.setWireframeColor(wireframeColor)
+                    renderModeControllerRef.current.setSkeletonVisible(skeletonVisible)
+                    renderModeControllerRef.current.setModelVisible(modelVisible)
 
                     // 初始化动画管理器
                     animationManagerRef.current = new AnimationController(model)
@@ -89,6 +93,17 @@ export default function ModelViewer({
         renderModeControllerRef.current?.setRenderMode(renderMode)
     }, [wireframeColor, renderMode])
 
+    // 显示骨骼
+    useEffect(() => {
+        renderModeControllerRef.current?.setSkeletonVisible(skeletonVisible)
+    }, [skeletonVisible])
+
+    // 显示模型
+    useEffect(() => {
+        renderModeControllerRef.current?.setModelVisible(modelVisible)
+    }, [modelVisible])
+
+
     return (
         <div className="modelviewer-container">
             {/* 顶部控制栏 */}
@@ -115,11 +130,15 @@ export default function ModelViewer({
                 <RenderSettingPanel
                     wireframeColor={wireframeColor}
                     renderMode={renderMode}
+                    skeletonVisible={skeletonVisible}
+                    modelVisible={modelVisible}
                     onColorSelect={(opt) => {
                         setWireframeColor(opt.hex)
                         setRenderMode(renderMode)
                     }}
                     onRenderModeChange={setRenderMode}
+                    onSkeletonVisibleChange={setSkeletonVisible}
+                    onModelVisibleChange={setModelVisible}
                 />
             )}
             <Canvas className="modelviewer-canvas">

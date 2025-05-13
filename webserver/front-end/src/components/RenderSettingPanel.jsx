@@ -10,9 +10,14 @@ const colorOptions = [
 export default function RenderSettingPanel({
     wireframeColor,
     renderMode,
+    skeletonVisible,
+    modelVisible,
     onColorSelect,
     onRenderModeChange,
+    onSkeletonVisibleChange,
+    onModelVisibleChange
 }) {
+
     return (
         <div className="render-sidebar">
             <div className="sidebar-title">渲染设置</div>
@@ -38,6 +43,23 @@ export default function RenderSettingPanel({
                     onChange={(e) => onRenderModeChange(e.target.checked ? 'wireframe' : 'mesh+wireframe')}
                 />
                 仅线框
+            </label>
+            <div className="section-title">骨骼</div>
+            <label className="checkbox-option">
+                <input
+                    type="checkbox"
+                    checked={skeletonVisible}
+                    onChange={(e) => onSkeletonVisibleChange(e.target.checked)}
+                />
+                显示骨骼
+            </label>
+            <label className="checkbox-option">
+                <input
+                    type="checkbox"
+                    checked={modelVisible}
+                    onChange={(e) => onModelVisibleChange(e.target.checked)}
+                />
+                显示模型
             </label>
         </div>
     )
