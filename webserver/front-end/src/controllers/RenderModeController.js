@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { SkeletonHelper } from 'three'
 
 export default class RenderModeController {
     constructor(model) {
@@ -18,6 +19,30 @@ export default class RenderModeController {
     setWireframeColor(hexColor) {
         this.wireframeColor = hexColor
     }
+    // 显示模型
+    setModelVisible(visible) {
+        this.modelVisible = visible
+        if (this.modelRoot) {
+            this.modelRoot.visible = visible
+        }
+    }
+    // 显示骨骼
+    setSkeletonVisible(visible) {
+        this.skeletonVisible = visible
+        if (this.skeletonHelper) {
+            this.skeletonHelper.visible = visible
+        } else if (visible) {
+            this.createSkeletonHelper()
+        }
+    }
+    // 创建可显示的骨骼
+    createSkeletonHelper() {
+        if (!this.modelRoot) return
+
+        this.skeletonHelper = new SkeletonHelper(this.modelRoot)
+        this.skeletonHelper.visible = this.skeletonVisible
+        this.modelRoot.parent.add(this.skeletonHelper)
+    }
     // 切换渲染模式
     setRenderMode(mode) {
         this.modelRoot.traverse(child => {
@@ -25,7 +50,7 @@ export default class RenderModeController {
                 const originalMaterial = this.originalMaterials.get(child.uuid)
                 if (!originalMaterial) return
 
-                // 如果没有线框颜色，清除线框网格
+                // 如果没有线框颜色或仅线框，清除线框网格
                 if (this.wireframeColor === null || this.wireframeColor === undefined || mode === 'wireframe') {
                     if (child.userData.wireframeMesh) {
                         child.remove(child.userData.wireframeMesh)
@@ -38,7 +63,7 @@ export default class RenderModeController {
                     const wireframeMesh = child.userData.wireframeMesh
                     wireframeMesh.material.color.setHex(this.wireframeColor)
                 }
-                // 如果线框网格不存在，且需要线框模式，则创建
+                // 如果线框网格不存在，且需要线框网格，则创建
                 else if (
                     (mode === 'mesh+wireframe') &&
                     this.wireframeColor !== null
