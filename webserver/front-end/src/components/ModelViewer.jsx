@@ -7,6 +7,7 @@ import Model from '../models/Model'
 import RenderModeController from '../controllers/RenderModeController'
 import RenderSettingPanel from './RenderSettingPanel'
 import AnimationController from '../controllers/AnimationController'
+import StatPanel from './StatsPanel'
 import '../css/ModelViewer.css'
 
 export default function ModelViewer({
@@ -24,6 +25,7 @@ export default function ModelViewer({
     const [renderMode, setRenderMode] = useState('mesh+wireframe')
     const [wireframeColor, setWireframeColor] = useState(null)
     const [showRenderSettings, setShowRenderSettings] = useState(false)
+    const [modelStats, setModelStats] = useState({ vertices: 0, triangles: 0, bones: 0 })
     const [selectedAnimationFile, setSelectedAnimationFile] = useState(animationUrls[0])
     const isLoadedRef = useRef(false)
 
@@ -39,8 +41,10 @@ export default function ModelViewer({
             const loadAssets = async () => {
                 try {
 
-                    const { model } = await modelRef.current.loadModel(modelUrl)
+                    const { model, stats } = await modelRef.current.loadModel(modelUrl)
                     groupRef.current.add(model)
+
+                    setModelStats(stats)
 
                     // 初始化渲染模式控制器
                     renderModeControllerRef.current = new RenderModeController(model)
@@ -141,6 +145,8 @@ export default function ModelViewer({
                     onModelVisibleChange={setModelVisible}
                 />
             )}
+            {/* 数据显示 */}
+            <StatPanel modelStats={modelStats} />
             <Canvas className="modelviewer-canvas">
                 <PerspectiveCamera
                     makeDefault

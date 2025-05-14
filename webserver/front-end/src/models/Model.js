@@ -10,6 +10,11 @@ export default class Model {
     constructor() {
         this.modelRoot = null
         this.initLoaderDefaults()
+        this.stats = {
+            vertices: 0,
+            triangles: 0,
+            bones: 0
+        }
     }
 
     // 路径/TGA处理器
@@ -20,36 +25,32 @@ export default class Model {
         }
     }
 
-    // 根据扩展名选择加载器
-    getLoader(ext) {
-        switch (ext) {
-            case 'fbx': return FBXLoader
-            case 'obj': return OBJLoader
-            case 'glb':
-            case 'gltf':
-                return GLTFLoader
-            default: throw new Error(`Unsupported format: ${ext}`)
-        }
-    }
-
     // 统一模型加载入口
     async loadModel(url) {
         const ext = url.split('.').pop().toLowerCase()
+        this.resetStats()
 
-        // OBJ特殊处理（需加载MTL）
-        if (ext === 'obj') {
-            const materials = await this.loadMTL(url)
-            return await this.loadWithObjLoader(url, materials)
-        }
+        try {
+            let result
+            if (ext === 'fbx') {
+                result = await this.loadWithFbxLoader(url)
+            } else if (ext === 'obj') {
+                const materials = await this.loadMTL(url)
+                result = await this.loadWithObjLoader(url, materials)
+            } else if (ext === 'gltf' || ext === 'glb') {
+                result = await this.loadWithGLTFLoader(url)
+            } else {
+                throw new Error(`Unsupported format: ${ext}`)
+            }
 
-        // GLTF/GLB加载
-        if (ext === 'gltf' || ext === 'glb') {
-            return this.loadWithGLTFLoader(url)
-        }
-
-        // FBX加载
-        if (ext === 'fbx') {
-            return this.loadWithFbxLoader(url)
+            // 返回模型和统计信息
+            return {
+                model: result.model,
+                stats: this.stats
+            }
+        } catch (error) {
+            console.error('Failed to load model:', error)
+            throw error
         }
     }
 
@@ -107,6 +108,8 @@ export default class Model {
 
     // 后处理模型
     postProcessModel(object) {
+        // 统计模型数据
+        this.calculateStats(object)
         // 如果是 Z-up 模型，则矫正旋转值
         this.fixModelRotation(object)
         // 如果没有贴图或材质就给一个默认的灰色材质
@@ -195,5 +198,38 @@ export default class Model {
             }
         })
     }
+    // 重置统计
+    resetStats() {
+        this.stats = {
+            vertices: 0,
+            triangles: 0,
+            bones: 0
+        }
+    }
 
+    // 计算模型统计信息
+    calculateStats(object) {
+        object.traverse((child) => {
+            if (child.isMesh && child.geometry) {
+                const geometry = child.geometry
+
+                // 统计顶点数
+                if (geometry.attributes.position) {
+                    this.stats.vertices += geometry.attributes.position.count
+                }
+
+                // 统计三角面数
+                if (geometry.index) {
+                    this.stats.triangles += geometry.index.count / 3
+                } else {
+                    this.stats.triangles += geometry.attributes.position.count / 3
+                }
+            }
+
+            if (child.isBone) {
+                this.stats.bones++
+            }
+        })
+
+    }
 }
