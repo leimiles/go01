@@ -2,10 +2,11 @@ import { AnimationMixer } from 'three'
 
 export default class AnimationController {
     constructor(modelRoot, onDuration = () => { }) {
-        this.mixer = new AnimationMixer(modelRoot);
+        this.mixer = new AnimationMixer(modelRoot)
         this.actions = new Map()
         this.currentAction = null
         this.modelRoot = modelRoot
+        this.onDuration = onDuration
     }
 
     // 添加动画
@@ -14,15 +15,30 @@ export default class AnimationController {
             const fixedClip = this.fixAnimationPaths(clip.clone(), this.modelRoot)
             const action = this.mixer.clipAction(fixedClip)
             this.actions.set(clip.name, action)
+
+            if (this.onDuration && !this.currentAction) {
+                this.onDuration(fixedClip.duration)
+            }
         })
     }
 
     // 播放指定动画
     playAnimation(name) {
-        this.stopCurrent();
-        this.currentAction = this.actions.get(name);
+        this.stopCurrent()
+        this.currentAction = this.actions.get(name)
         if (this.currentAction) {
-            this.currentAction.play();
+            this.currentAction.play()
+            if (this.onDuration) {
+                this.onDuration(this.currentAction.getClip().duration)
+            }
+        }
+    }
+
+    // 设置动画时间
+    setTime(time) {
+        if (this.currentAction) {
+            this.currentAction.time = time
+            this.mixer.setTime(time)
         }
     }
 
@@ -62,17 +78,17 @@ export default class AnimationController {
     // 停止所有动画
     stopAll() {
         if (this.currentAction) {
-            this.currentAction.stop();
-            this.currentAction = null;
+            this.currentAction.stop()
+            this.currentAction = null
         }
         if (this.mixer) {
-            this.mixer.stopAllAction();
+            this.mixer.stopAllAction()
         }
     }
     // 释放资源
     dispose() {
-        this.stopAll();
-        this.mixer = null;
-        this.model = null;
+        this.stopAll()
+        this.mixer = null
+        this.model = null
     }
 }

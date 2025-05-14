@@ -7,12 +7,13 @@ import Model from '../models/Model'
 import RenderModeController from '../controllers/RenderModeController'
 import RenderSettingPanel from './RenderSettingPanel'
 import AnimationController from '../controllers/AnimationController'
+import AnimationControlPanel from './AnimationControlPanel'
 import StatPanel from './StatsPanel'
 import '../css/ModelViewer.css'
 
 export default function ModelViewer({
     modelUrl = 'Bear.fbx',
-    animationUrls = ['Bear@idle.fbx'],
+    animationUrls = ['Bear@idle.fbx', 'Bear Jump.FBX', 'Bear Misc.FBX'],
 }) {
     const controlsRef = useRef()
     const modelRef = useRef(new Model())
@@ -27,6 +28,10 @@ export default function ModelViewer({
     const [showRenderSettings, setShowRenderSettings] = useState(false)
     const [modelStats, setModelStats] = useState({ vertices: 0, triangles: 0, bones: 0 })
     const [selectedAnimationFile, setSelectedAnimationFile] = useState(animationUrls[0])
+    const [duration, setDuration] = useState(1)
+    const [progress, setProgress] = useState(0)
+    const [isPlaying, setIsPlaying] = useState(true)
+    const wasPlayingRef = useRef(true)
     const isLoadedRef = useRef(false)
 
     // 模型加载
@@ -55,7 +60,7 @@ export default function ModelViewer({
                     renderModeControllerRef.current.setModelVisible(modelVisible)
 
                     // 初始化动画管理器
-                    animationManagerRef.current = new AnimationController(model)
+                    animationManagerRef.current = new AnimationController(model, setDuration)
 
                     setIsModelReady(true)
                 } catch (err) {
@@ -107,6 +112,12 @@ export default function ModelViewer({
         renderModeControllerRef.current?.setModelVisible(modelVisible)
     }, [modelVisible])
 
+    // 响应动画进度变化
+    useEffect(() => {
+        if (animationManagerRef.current) {
+            animationManagerRef.current.setTime(progress)
+        }
+    }, [progress])
 
     return (
         <div className="modelviewer-container">
@@ -147,6 +158,24 @@ export default function ModelViewer({
             )}
             {/* 数据显示 */}
             <StatPanel modelStats={modelStats} />
+            {/* 动画播放栏 */}
+            <AnimationControlPanel
+                animationFiles={animationUrls}
+                selectedAnimationFile={selectedAnimationFile}
+                isPlaying={isPlaying}
+                progress={progress}
+                duration={duration}
+                onAnimationSelect={setSelectedAnimationFile}
+                onPlayPause={() => setIsPlaying(!isPlaying)}
+                onProgressChange={setProgress}
+                onProgressDragStart={() => {
+                    wasPlayingRef.current = isPlaying
+                    setIsPlaying(false)
+                }}
+                onProgressDragEnd={() => {
+                    if (wasPlayingRef.current) setIsPlaying(true)
+                }}
+            />
             <Canvas className="modelviewer-canvas">
                 <PerspectiveCamera
                     makeDefault
@@ -167,6 +196,8 @@ export default function ModelViewer({
                 {isModelReady && (
                     <FrameSync
                         animationManagerRef={animationManagerRef}
+                        isPlaying={isPlaying}
+                        setProgress={setProgress}
                     />
                 )}
             </Canvas>
@@ -174,10 +205,12 @@ export default function ModelViewer({
     )
 }
 
-function FrameSync({ animationManagerRef }) {
+function FrameSync({ animationManagerRef, isPlaying, setProgress }) {
     useFrame((_, delta) => {
-        if (animationManagerRef.current?.currentAction) {
+        if (animationManagerRef.current?.currentAction && isPlaying) {
             animationManagerRef.current.update(delta)
+            const action = animationManagerRef.current.currentAction
+            setProgress(Math.min(action.time, action.getClip().duration))
         }
     })
     return null
