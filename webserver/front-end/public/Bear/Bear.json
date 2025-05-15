@@ -1,0 +1,12 @@
+{
+  "name": "Bear",
+  "content": {
+    "model": "Bear.FBX",
+    "animation": "animations",
+    "texture": "textures"
+  },
+  "tags": [
+    "动物",
+    "卡通"
+  ]
+}

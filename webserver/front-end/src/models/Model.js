@@ -20,9 +20,23 @@ export default class Model {
     // 路径/TGA处理器
     initLoaderDefaults() {
         this.loaderSettings = {
-            path: '/models/',
+            basePath: '/Bear/',
+            texturePath: 'textures/',
+            animationPath: 'animations/',
             tgaHandler: new TGALoader()
         }
+    }
+
+    setBasePath(path) {
+        this.loaderSettings.basePath = path.endsWith('/') ? path : path + '/'
+    }
+
+    getTexturePath() {
+        return `${this.loaderSettings.basePath}${this.loaderSettings.texturePath}`
+    }
+
+    getAnimationPath() {
+        return `${this.loaderSettings.basePath}${this.loaderSettings.animationPath}`
     }
 
     // 统一模型加载入口
@@ -58,7 +72,7 @@ export default class Model {
     async loadMTL(objUrl) {
         const mtlUrl = objUrl.replace('.obj', '.mtl')
         const mtlLoader = new MTLLoader()
-        mtlLoader.setPath(this.loaderSettings.path)
+        mtlLoader.setPath(this.getTexturePath)
         mtlLoader.manager.addHandler(/\.tga$/i, this.loaderSettings.tgaHandler)
 
         const materials = await new Promise((resolve, reject) => {
@@ -72,7 +86,7 @@ export default class Model {
     async loadWithObjLoader(url, materials) {
         const objLoader = new OBJLoader()
         objLoader.setMaterials(materials)
-        objLoader.setPath(this.loaderSettings.path)
+        objLoader.setPath(this.loaderSettings.basePath)
 
         const object = await new Promise((resolve, reject) => {
             objLoader.load(url, resolve, undefined, reject)
@@ -85,7 +99,7 @@ export default class Model {
     // GLTF/GLB加载
     async loadWithGLTFLoader(url) {
         const gltfLoader = new GLTFLoader()
-        gltfLoader.setPath(this.loaderSettings.path)
+        gltfLoader.setPath(this.loaderSettings.basePath)
         const gltf = await new Promise((resolve, reject) => {
             gltfLoader.load(url, resolve, undefined, reject)
         })
@@ -96,7 +110,8 @@ export default class Model {
     // FBX加载
     async loadWithFbxLoader(url) {
         const fbxLoader = new FBXLoader()
-        fbxLoader.setPath(this.loaderSettings.path)
+        fbxLoader.setPath(this.loaderSettings.basePath)
+        fbxLoader.setResourcePath(this.getTexturePath())
         fbxLoader.manager.addHandler(/\.tga$/i, this.loaderSettings.tgaHandler)
         const object = await new Promise((resolve, reject) => {
             fbxLoader.load(url, resolve, undefined, reject)
@@ -117,31 +132,31 @@ export default class Model {
         this.modelRoot = object
     }
 
-    // 加载GLTF/GLB动画
-    async loadGLTFAnimation(url) {
-        const gltfLoader = new GLTFLoader()
-        gltfLoader.setPath(this.loaderSettings.path)
-        const gltf = await new Promise((resolve, reject) => {
-            gltfLoader.load(url, resolve, undefined, reject)
-        })
-
-        return gltf.animations || []
-    }
-
-    // 加载动画
     async loadAnimation(url) {
         const ext = url.split('.').pop().toLowerCase()
-        if (ext === 'gltf' || ext === 'glb') {
-            return this.loadGLTFAnimation(url)
+
+        try {
+            if (ext === 'gltf' || ext === 'glb') {
+                const gltfLoader = new GLTFLoader()
+                gltfLoader.setPath(this.getAnimationPath())
+                const gltf = await new Promise((resolve, reject) => {
+                    gltfLoader.load(url, resolve, undefined, reject)
+                })
+                return gltf.animations || []
+            } else {
+                const loader = new FBXLoader()
+                loader.setPath(this.getAnimationPath())
+                loader.setResourcePath(this.getTexturePath())
+                loader.manager.addHandler(/\.tga$/i, this.loaderSettings.tgaHandler)
+                return new Promise((resolve, reject) => {
+                    loader.load(url, (animData) => {
+                        resolve(animData.animations || [])
+                    }, undefined, reject)
+                })
+            }
+        } catch (error) {
+            throw new Error(`动画加载失败: ${error.message}`)
         }
-        const loader = new FBXLoader()
-        loader.setPath(this.loaderSettings.path)
-        return new Promise((resolve, reject) => {
-            loader.load(url, (animData) => {
-                const clips = animData.animations || []
-                resolve(clips)
-            }, undefined, reject)
-        })
     }
 
     // 对 Z-up 模型进行旋转矫正
@@ -234,8 +249,8 @@ export default class Model {
     }
 
     getBoundingBox(object) {
-        const box = new THREE.Box3();
-        box.setFromObject(object);
-        return box;
+        const box = new THREE.Box3()
+        box.setFromObject(object)
+        return box
     }
 }

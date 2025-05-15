@@ -14,8 +14,8 @@ import '../css/ModelViewer.css'
 import * as THREE from 'three'
 
 export default function ModelViewer({
-    modelUrl = 'Bear.fbx',
-    animationUrls = ['Bear@idle.fbx', 'Bear Jump.FBX', 'Bear Misc.FBX'],
+    modelUrl = 'Bear.FBX',
+    animationUrls = ['Bear Idle.FBX', 'Bear Jump.FBX', 'Bear Misc.FBX'],
 }) {
     const controlsRef = useRef()
     const cameraRef = useRef()
