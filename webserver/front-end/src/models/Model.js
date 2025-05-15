@@ -232,4 +232,10 @@ export default class Model {
         })
 
     }
+
+    getBoundingBox(object) {
+        const box = new THREE.Box3();
+        box.setFromObject(object);
+        return box;
+    }
 }

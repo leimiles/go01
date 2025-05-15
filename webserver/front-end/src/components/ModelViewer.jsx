@@ -11,11 +11,14 @@ import AnimationControlPanel from './AnimationControlPanel'
 import StatPanel from './StatsPanel'
 import '../css/ModelViewer.css'
 
+import * as THREE from 'three'
+
 export default function ModelViewer({
     modelUrl = 'Bear.fbx',
     animationUrls = ['Bear@idle.fbx', 'Bear Jump.FBX', 'Bear Misc.FBX'],
 }) {
     const controlsRef = useRef()
+    const cameraRef = useRef()
     const modelRef = useRef(new Model())
     const groupRef = useRef()
     const renderModeControllerRef = useRef()
@@ -34,6 +37,44 @@ export default function ModelViewer({
     const wasPlayingRef = useRef(true)
     const isLoadedRef = useRef(false)
 
+    // 计算摄像机距离
+    const calculateCameraSettings = (model) => {
+        const box = modelRef.current.getBoundingBox(model)
+        const center = box.getCenter(new THREE.Vector3())
+        const size = box.getSize(new THREE.Vector3())
+        const maxDim = Math.max(size.x, size.y, size.z)
+        const cameraDistance = maxDim * 2
+        const yOffset = size.y * 0.2
+
+        return {
+            position: new THREE.Vector3(
+                center.x,
+                center.y + yOffset,
+                cameraDistance
+            ),
+            target: new THREE.Vector3(
+                center.x,
+                center.y - yOffset,
+                center.z
+            )
+        }
+    }
+    // 应用摄像机和控制器的设置
+    const applyCameraSettings = (settings) => {
+        cameraRef.current.position.copy(settings.position)
+        cameraRef.current.lookAt(settings.target)
+        controlsRef.current.target.copy(settings.target)
+        controlsRef.current.update()
+    }
+
+    // 重置视图
+    const resetView = () => {
+        if (controlsRef.current && cameraRef.current && modelRef.current.modelRoot) {
+            const cameraSettings = calculateCameraSettings(modelRef.current.modelRoot)
+            applyCameraSettings(cameraSettings)
+        }
+    }
+
     // 模型加载
     useEffect(() => {
         const waitForGroup = () => {
@@ -48,6 +89,9 @@ export default function ModelViewer({
 
                     const { model, stats } = await modelRef.current.loadModel(modelUrl)
                     groupRef.current.add(model)
+
+                    const cameraSettings = calculateCameraSettings(model)
+                    applyCameraSettings(cameraSettings)
 
                     setModelStats(stats)
 
@@ -132,6 +176,15 @@ export default function ModelViewer({
                         <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5zm7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.08-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.08.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.61-.25 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66z" />
                     </svg>
                 </button>
+                <button
+                    className="reset-view-button"
+                    onClick={resetView}
+                    title="重置视图"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                    </svg>
+                </button>
                 <div className="spacer"></div>
                 <button className="download-button" title="下载">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -178,8 +231,8 @@ export default function ModelViewer({
             />
             <Canvas className="modelviewer-canvas">
                 <PerspectiveCamera
+                    ref={cameraRef}
                     makeDefault
-                    position={[0, 200, 500]}
                     fov={45}
                     near={0.1}
                     far={1000}
@@ -190,8 +243,7 @@ export default function ModelViewer({
                 <OrbitControls
                     ref={controlsRef}
                     enableZoom={true}
-                    enablePan={true}
-                    target={[0, 50, 0]} />
+                    enablePan={true} />
                 <WorldAxes size={10} />
                 {isModelReady && (
                     <FrameSync
