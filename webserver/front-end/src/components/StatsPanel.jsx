@@ -1,3 +1,4 @@
+import '../css/Stats.css'
 export default function StatsPanel({ modelStats }) {
     return (
         <div className="model-stats-panel">

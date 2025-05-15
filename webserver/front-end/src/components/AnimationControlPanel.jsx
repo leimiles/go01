@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import '../css/Animation.css'
 
 export default function AnimationControlPanel({
     animationFiles,

@@ -1,0 +1,156 @@
+/* 动画列表 */
+.animation-item {
+    padding: 8px 12px;
+    margin: 4px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s;
+    background-color: transparent;
+}
+
+.animation-item:hover {
+    background: #363636;
+}
+
+.animation-item.selected {
+    background: #4d4d4d;
+    color: #ffffff;
+}
+
+/* 播放控制栏 */
+.playback-controls {
+    height: 24px;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(45, 45, 45, 0.3);
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    font-size: 14px;
+    border: 1px solid #404040;
+}
+
+.play-button {
+    order: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.play-button:hover {
+    background: #4d4d4d;
+}
+
+.play-button svg {
+    fill: #ffffff;
+}
+
+.progress-slider {
+    order: 2;
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #404040;
+    border-radius: 3px;
+    outline: none;
+    transition: height 0.2s;
+}
+
+.progress-slider:hover {
+    height: 6px;
+}
+
+.progress-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.progress-slider::-webkit-slider-thumb:hover {
+    background: #ffffff;
+    transform: scale(1.1);
+}
+
+/* 动画下拉菜单 */
+.animation-dropdown-container {
+    order: 3;
+    position: relative;
+    margin-right: 0px;
+    min-width: 120px;
+}
+
+.animation-dropdown-toggle {
+    padding: 6px 12px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #e0e0e0;
+    transition: all 0.2s;
+}
+
+.animation-dropdown-toggle:hover {
+    background: #4d4d4d;
+    border-color: #505050;
+}
+
+.animation-dropdown-toggle svg {
+    fill: #e0e0e0;
+    transition: transform 0.2s;
+}
+
+.animation-dropdown-toggle.open svg {
+    transform: rotate(180deg);
+}
+
+.animation-dropdown-list {
+    position: absolute;
+    bottom: 130%;
+    left: 0;
+    right: 0;
+    background: rgba(45, 45, 45, 0.3);
+    border: 1px solid #404040;
+    border-radius: 4px;
+    z-index: 20;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform-origin: bottom;
+    animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

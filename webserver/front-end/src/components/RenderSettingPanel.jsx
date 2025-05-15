@@ -1,3 +1,4 @@
+import '../css/RenderMode.css'
 const colorOptions = [
     { id: 'none', hex: null },
     { id: 'black', hex: 0x000001 },
