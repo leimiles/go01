@@ -30,6 +30,7 @@
 }
 
 .settings-button,
+.reset-view-button,
 .download-button,
 .close-button {
     width: 24px;
@@ -44,6 +45,7 @@
 }
 
 .settings-button:hover,
+.reset-view-button:hover,
 .download-button:hover {
     color: #ffffff;
 }
