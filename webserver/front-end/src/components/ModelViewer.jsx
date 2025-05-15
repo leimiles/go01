@@ -11,6 +11,8 @@ import AnimationControlPanel from './AnimationControlPanel'
 import StatPanel from './StatsPanel'
 import '../css/ModelViewer.css'
 
+import * as THREE from 'three'
+
 export default function ModelViewer({
     modelUrl = 'Bear.fbx',
     animationUrls = ['Bear@idle.fbx', 'Bear Jump.FBX', 'Bear Misc.FBX'],
@@ -35,6 +37,44 @@ export default function ModelViewer({
     const wasPlayingRef = useRef(true)
     const isLoadedRef = useRef(false)
 
+    // 计算摄像机距离
+    const calculateCameraSettings = (model) => {
+        const box = modelRef.current.getBoundingBox(model)
+        const center = box.getCenter(new THREE.Vector3())
+        const size = box.getSize(new THREE.Vector3())
+        const maxDim = Math.max(size.x, size.y, size.z)
+        const cameraDistance = maxDim * 2
+        const yOffset = size.y * 0.2
+
+        return {
+            position: new THREE.Vector3(
+                center.x,
+                center.y + yOffset,
+                cameraDistance
+            ),
+            target: new THREE.Vector3(
+                center.x,
+                center.y - yOffset,
+                center.z
+            )
+        }
+    }
+    // 应用摄像机和控制器的设置
+    const applyCameraSettings = (settings) => {
+        cameraRef.current.position.copy(settings.position)
+        cameraRef.current.lookAt(settings.target)
+        controlsRef.current.target.copy(settings.target)
+        controlsRef.current.update()
+    }
+
+    // 重置视图
+    const resetView = () => {
+        if (controlsRef.current && cameraRef.current && modelRef.current.modelRoot) {
+            const cameraSettings = calculateCameraSettings(modelRef.current.modelRoot)
+            applyCameraSettings(cameraSettings)
+        }
+    }
+
     // 模型加载
     useEffect(() => {
         const waitForGroup = () => {
@@ -49,6 +89,9 @@ export default function ModelViewer({
 
                     const { model, stats } = await modelRef.current.loadModel(modelUrl)
                     groupRef.current.add(model)
+
+                    const cameraSettings = calculateCameraSettings(model)
+                    applyCameraSettings(cameraSettings)
 
                     setModelStats(stats)
 
@@ -120,18 +163,6 @@ export default function ModelViewer({
         }
     }, [progress])
 
-    // 重置视图
-    const resetView = () => {
-        if (controlsRef.current && cameraRef.current) {
-            // 重置相机位置
-            cameraRef.current.position.set(0, 200, 500)
-            // 重置控制器目标
-            controlsRef.current.target.set(0, 50, 0)
-            // 更新控制器
-            controlsRef.current.update()
-        }
-    }
-
     return (
         <div className="modelviewer-container">
             {/* 顶部控制栏 */}
@@ -202,7 +233,6 @@ export default function ModelViewer({
                 <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
-                    position={[0, 200, 500]}
                     fov={45}
                     near={0.1}
                     far={1000}
@@ -213,8 +243,7 @@ export default function ModelViewer({
                 <OrbitControls
                     ref={controlsRef}
                     enableZoom={true}
-                    enablePan={true}
-                    target={[0, 50, 0]} />
+                    enablePan={true} />
                 <WorldAxes size={10} />
                 {isModelReady && (
                     <FrameSync
