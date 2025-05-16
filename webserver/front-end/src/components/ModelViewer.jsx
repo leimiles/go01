@@ -14,7 +14,7 @@ import '../css/ModelViewer.css'
 import * as THREE from 'three'
 
 export default function ModelViewer({
-    basePath = '/assets-lib/assets-lib/AssetStorePackages/Arts/Characters/Animal Friends Forest Animals/Forest Animals/Bear',
+    basePath = 'assets-lib/AssetStorePackages/Arts/Characters/Animal Friends Forest Animals/Forest Animals/Bear',
     modelUrl = 'Bear.FBX',
     animationUrls = ['Bear Idle.FBX', 'Bear Jump.FBX', 'Bear Misc.FBX'],
 }) {
