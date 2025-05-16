@@ -11,6 +11,7 @@ const colorOptions = [
 export default function RenderSettingPanel({
     wireframeColor,
     renderMode,
+    showSkeletonOption,
     skeletonVisible,
     modelVisible,
     onColorSelect,
@@ -45,23 +46,28 @@ export default function RenderSettingPanel({
                 />
                 仅线框
             </label>
-            <div className="section-title">骨骼</div>
-            <label className="checkbox-option">
-                <input
-                    type="checkbox"
-                    checked={skeletonVisible}
-                    onChange={(e) => onSkeletonVisibleChange(e.target.checked)}
-                />
-                显示骨骼
-            </label>
-            <label className="checkbox-option">
-                <input
-                    type="checkbox"
-                    checked={modelVisible}
-                    onChange={(e) => onModelVisibleChange(e.target.checked)}
-                />
-                显示模型
-            </label>
+            {/* 只在有动画时显示骨骼选项 */}
+            {showSkeletonOption && (
+                <>
+                    <div className="section-title">骨骼</div>
+                    <label className="checkbox-option">
+                        <input
+                            type="checkbox"
+                            checked={skeletonVisible}
+                            onChange={(e) => onSkeletonVisibleChange(e.target.checked)}
+                        />
+                        显示骨骼
+                    </label>
+                    <label className="checkbox-option">
+                        <input
+                            type="checkbox"
+                            checked={modelVisible}
+                            onChange={(e) => onModelVisibleChange(e.target.checked)}
+                        />
+                        显示模型
+                    </label>
+                </>
+            )}
         </div>
     )
 }
