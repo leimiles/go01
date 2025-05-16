@@ -14,16 +14,19 @@ import '../css/ModelViewer.css'
 import * as THREE from 'three'
 
 export default function ModelViewer({
+    basePath = '/Bear/',
     modelUrl = 'Bear.FBX',
     animationUrls = ['Bear Idle.FBX', 'Bear Jump.FBX', 'Bear Misc.FBX'],
 }) {
     const controlsRef = useRef()
     const cameraRef = useRef()
-    const modelRef = useRef(new Model())
+    const modelRef = useRef(new Model(animationUrls))
     const groupRef = useRef()
     const renderModeControllerRef = useRef()
-    const animationManagerRef = useRef()
+    const animationControllerRef = useRef()
     const [isModelReady, setIsModelReady] = useState(false)
+    const hasAnimations = animationUrls.length > 0
+    const [modelHasBones, setModelHasBones] = useState(false)
     const [skeletonVisible, setSkeletonVisible] = useState(false)
     const [modelVisible, setModelVisible] = useState(true)
     const [renderMode, setRenderMode] = useState('mesh+wireframe')
@@ -75,6 +78,12 @@ export default function ModelViewer({
         }
     }
 
+    useEffect(() => {
+        if (modelRef.current && basePath) {
+            modelRef.current.setBasePath(basePath)
+        }
+    }, [basePath])
+
     // 模型加载
     useEffect(() => {
         const waitForGroup = () => {
@@ -87,7 +96,8 @@ export default function ModelViewer({
             const loadAssets = async () => {
                 try {
 
-                    const { model, stats } = await modelRef.current.loadModel(modelUrl)
+                    const { model, stats, hasBones } = await modelRef.current.loadModel(modelUrl)
+                    setModelHasBones(hasBones)
                     groupRef.current.add(model)
 
                     const cameraSettings = calculateCameraSettings(model)
@@ -100,11 +110,13 @@ export default function ModelViewer({
                     renderModeControllerRef.current.cacheOriginalMaterials()
                     renderModeControllerRef.current.setRenderMode(renderMode)
                     renderModeControllerRef.current.setWireframeColor(wireframeColor)
-                    renderModeControllerRef.current.setSkeletonVisible(skeletonVisible)
+                    renderModeControllerRef.current.setSkeletonVisible(skeletonVisible && hasAnimations)
                     renderModeControllerRef.current.setModelVisible(modelVisible)
 
                     // 初始化动画管理器
-                    animationManagerRef.current = new AnimationController(model, setDuration)
+                    if (hasAnimations) {
+                        animationControllerRef.current = new AnimationController(model, setDuration)
+                    }
 
                     setIsModelReady(true)
                 } catch (err) {
@@ -116,21 +128,21 @@ export default function ModelViewer({
         }
         waitForGroup()
         return () => {
-            animationManagerRef.current?.dispose()
+            animationControllerRef.current?.dispose()
             renderModeControllerRef.current?.dispose()
         }
     }, [])
 
     // 动画加载
     useEffect(() => {
-        if (!isModelReady || !selectedAnimationFile) return
+        if (!isModelReady || !selectedAnimationFile || !hasAnimations) return
 
         const loadAnim = async () => {
             try {
                 const clips = await modelRef.current.loadAnimation(selectedAnimationFile)
-                animationManagerRef.current.addAnimations(clips)
-                if (clips.length > 0) {
-                    animationManagerRef.current.playAnimation(clips[0].name)
+                if (animationControllerRef.current && clips.length > 0) {
+                    animationControllerRef.current.addAnimations(clips)
+                    animationControllerRef.current.playAnimation(clips[0].name)
                 }
             } catch (err) {
                 console.error("动画加载失败:", err)
@@ -138,7 +150,7 @@ export default function ModelViewer({
         }
 
         loadAnim()
-    }, [selectedAnimationFile, isModelReady])
+    }, [selectedAnimationFile, isModelReady, hasAnimations])
 
     // 响应渲染模式变化
     useEffect(() => {
@@ -158,8 +170,8 @@ export default function ModelViewer({
 
     // 响应动画进度变化
     useEffect(() => {
-        if (animationManagerRef.current) {
-            animationManagerRef.current.setTime(progress)
+        if (animationControllerRef.current) {
+            animationControllerRef.current.setTime(progress)
         }
     }, [progress])
 
@@ -198,6 +210,7 @@ export default function ModelViewer({
                 <RenderSettingPanel
                     wireframeColor={wireframeColor}
                     renderMode={renderMode}
+                    showSkeletonOption={modelHasBones}
                     skeletonVisible={skeletonVisible}
                     modelVisible={modelVisible}
                     onColorSelect={(opt) => {
@@ -210,25 +223,31 @@ export default function ModelViewer({
                 />
             )}
             {/* 数据显示 */}
-            <StatPanel modelStats={modelStats} />
-            {/* 动画播放栏 */}
-            <AnimationControlPanel
-                animationFiles={animationUrls}
-                selectedAnimationFile={selectedAnimationFile}
-                isPlaying={isPlaying}
-                progress={progress}
-                duration={duration}
-                onAnimationSelect={setSelectedAnimationFile}
-                onPlayPause={() => setIsPlaying(!isPlaying)}
-                onProgressChange={setProgress}
-                onProgressDragStart={() => {
-                    wasPlayingRef.current = isPlaying
-                    setIsPlaying(false)
-                }}
-                onProgressDragEnd={() => {
-                    if (wasPlayingRef.current) setIsPlaying(true)
-                }}
+            <StatPanel
+                modelStats={modelStats}
+                showBonesCount={modelHasBones}
+
             />
+            {/* 动画播放栏 */}
+            {hasAnimations && (
+                <AnimationControlPanel
+                    animationFiles={animationUrls}
+                    selectedAnimationFile={selectedAnimationFile}
+                    isPlaying={isPlaying}
+                    progress={progress}
+                    duration={duration}
+                    onAnimationSelect={setSelectedAnimationFile}
+                    onPlayPause={() => setIsPlaying(!isPlaying)}
+                    onProgressChange={setProgress}
+                    onProgressDragStart={() => {
+                        wasPlayingRef.current = isPlaying
+                        setIsPlaying(false)
+                    }}
+                    onProgressDragEnd={() => {
+                        if (wasPlayingRef.current) setIsPlaying(true)
+                    }}
+                />
+            )}
             <Canvas className="modelviewer-canvas">
                 <PerspectiveCamera
                     ref={cameraRef}
@@ -247,7 +266,7 @@ export default function ModelViewer({
                 <WorldAxes size={10} />
                 {isModelReady && (
                     <FrameSync
-                        animationManagerRef={animationManagerRef}
+                        animationManagerRef={animationControllerRef}
                         isPlaying={isPlaying}
                         setProgress={setProgress}
                     />

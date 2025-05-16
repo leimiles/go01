@@ -7,7 +7,7 @@ import { TGALoader } from 'three/examples/jsm/loaders/TGALoader'
 import * as THREE from 'three'
 
 export default class Model {
-    constructor() {
+    constructor(animationUrls = []) {
         this.modelRoot = null
         this.initLoaderDefaults()
         this.stats = {
@@ -15,6 +15,8 @@ export default class Model {
             triangles: 0,
             bones: 0
         }
+        this.animationUrls = animationUrls
+        this.isLoadingAnimationAsModel = false
     }
 
     // 路径/TGA处理器
@@ -47,20 +49,25 @@ export default class Model {
         try {
             let result
             if (ext === 'fbx') {
-                result = await this.loadWithFbxLoader(url)
+                result = await this.loadWithFbxLoader(url, this.isLoadingAnimationAsModel)
             } else if (ext === 'obj') {
                 const materials = await this.loadMTL(url)
                 result = await this.loadWithObjLoader(url, materials)
             } else if (ext === 'gltf' || ext === 'glb') {
-                result = await this.loadWithGLTFLoader(url)
+                result = await this.loadWithGLTFLoader(url, this.isLoadingAnimationAsModel)
+            } else if (ext === '') {
+                this.isLoadingAnimationAsModel = true
+                console.log(this.animationUrls[0])
+                return this.loadModel(this.animationUrls[0])
             } else {
                 throw new Error(`Unsupported format: ${ext}`)
             }
-
+            const hasBones = this.calculateStats(result.model)
             // 返回模型和统计信息
             return {
                 model: result.model,
-                stats: this.stats
+                stats: this.stats,
+                hasBones
             }
         } catch (error) {
             console.error('Failed to load model:', error)
@@ -97,9 +104,15 @@ export default class Model {
     }
 
     // GLTF/GLB加载
-    async loadWithGLTFLoader(url) {
+    async loadWithGLTFLoader(url, isAnimation = false) {
         const gltfLoader = new GLTFLoader()
-        gltfLoader.setPath(this.loaderSettings.basePath)
+        if (isAnimation) {
+            gltfLoader.setPath(this.getAnimationPath())
+        }
+        else {
+            gltfLoader.setPath(this.loaderSettings.basePath)
+            console.log(this.loaderSettings.basePath)
+        }
         const gltf = await new Promise((resolve, reject) => {
             gltfLoader.load(url, resolve, undefined, reject)
         })
@@ -108,9 +121,14 @@ export default class Model {
     }
 
     // FBX加载
-    async loadWithFbxLoader(url) {
+    async loadWithFbxLoader(url, isAnimation = false) {
         const fbxLoader = new FBXLoader()
-        fbxLoader.setPath(this.loaderSettings.basePath)
+        if (isAnimation) {
+            fbxLoader.setPath(this.getAnimationPath())
+        }
+        else {
+            fbxLoader.setPath(this.loaderSettings.basePath)
+        }
         fbxLoader.setResourcePath(this.getTexturePath())
         fbxLoader.manager.addHandler(/\.tga$/i, this.loaderSettings.tgaHandler)
         const object = await new Promise((resolve, reject) => {
@@ -123,8 +141,6 @@ export default class Model {
 
     // 后处理模型
     postProcessModel(object) {
-        // 统计模型数据
-        this.calculateStats(object)
         // 如果是 Z-up 模型，则矫正旋转值
         this.fixModelRotation(object)
         // 如果没有贴图或材质就给一个默认的灰色材质
@@ -224,6 +240,7 @@ export default class Model {
 
     // 计算模型统计信息
     calculateStats(object) {
+        let bonesCount = 0
         object.traverse((child) => {
             if (child.isMesh && child.geometry) {
                 const geometry = child.geometry
@@ -242,9 +259,11 @@ export default class Model {
             }
 
             if (child.isBone) {
-                this.stats.bones++
+                bonesCount++
             }
         })
+        this.stats.bones = bonesCount
+        return bonesCount > 0
 
     }
 
