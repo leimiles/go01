@@ -1,0 +1,15 @@
+.content-page {
+    padding: 2rem;
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+.content-page h1 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.content-page p {
+    color: #cccccc;
+    line-height: 1.6;
+} 

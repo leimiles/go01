@@ -1,9 +1,15 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import '../css/LinkArrow.css'
 
-export default function LinkArrow({ to = "/content", title = "Goto" }) {
+function LinkArrow() {
+    const navigate = useNavigate()
+
     return (
-        <Link to={to} className="svg-arrow-link" title={title}>
+        <span 
+            className="svg-arrow-link" 
+            onClick={() => navigate('/content')}
+            title="点击进入内容页面"
+        >
             <svg
                 width="40"
                 height="40"
@@ -18,6 +24,8 @@ export default function LinkArrow({ to = "/content", title = "Goto" }) {
                 <path d="M5 12h14"></path>
                 <path d="M13 6l6 6-6 6"></path>
             </svg>
-        </Link>
+        </span>
     )
 }
+
+export default LinkArrow
