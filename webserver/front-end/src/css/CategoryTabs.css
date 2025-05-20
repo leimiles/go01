@@ -1,0 +1,23 @@
+.category-tabs {
+    display: flex;
+    gap: 1rem;
+}
+
+.category-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #999;
+}
+
+.category-tab:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.category-tab.active {
+    background-color: #444;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+} 
