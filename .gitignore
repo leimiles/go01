@@ -25,3 +25,4 @@ go.work.sum
 .env
 .DS_Store
 webserver/front-end/package-lock.json
+webserver/public
