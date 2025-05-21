@@ -36,7 +36,7 @@ assets-3d 是一个基于 Go + React + Three.js 的项目框架，旨在提供�
     ```
     npm create vite@latest
     ```
-2. 进入工程，安装与运行，通过 localhost:5173 测试
+2. 进入工程，安装与运行，通过 localhost:5173 测试，如果是新拉工程，可以直接执行 install
     ```
     npm install
     npm run dev
@@ -89,3 +89,10 @@ assets-3d/
 ## 许可证
 
 此项目基于 [MIT License](LICENSE)。
+
+## 获得本机 ip
+
+1. mac：
+    ```bash
+    ipconfig getifaddr en0
+    ```

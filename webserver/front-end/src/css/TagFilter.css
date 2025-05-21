@@ -1,0 +1,35 @@
+.tag-filter {
+    padding: 1rem;
+}
+
+.tag-filter h3 {
+    margin: 0 0 1rem 0;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tag-item {
+    padding: 0.5rem;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ccc;
+}
+
+.tag-item:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.tag-item.selected {
+    background-color: #444;
+    color: #ffd700;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+} 
