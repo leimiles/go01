@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react'
 import '../css/TagFilter.css'
+import { fetchTags } from '../services/assetService'
 
 function TagFilter({ selectedTags, onSelectTags }) {
     const [availableTags, setAvailableTags] = useState([])
 
     useEffect(() => {
-        // TODO: 从后端获取标签数据
-        const mockTags = [
-            '动物', '人形', '熊', '猫', '机械', '机器人',
-            '武器', '道具', '建筑', '动画', '可爱', '写实'
-        ]
-        setAvailableTags(mockTags)
+        fetchTags().then(setAvailableTags)
     }, [])
 
     const handleTagClick = (tag) => {
