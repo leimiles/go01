@@ -16,7 +16,7 @@ import * as THREE from 'three'
 export default function ModelViewer({
     basePath = '/assets-lib/AssetStorePackages/Arts/Characters/Animal Friends Forest Animals/Forest Animals/Bear',
     modelUrl = 'Bear.FBX',
-    animationUrls = ['Bear Idle.FBX', 'Bear Jump.FBX', 'Bear Misc.FBX'],
+    animationUrls = ['Bear Idle.FBX', 'Bear Jump.FBX', 'Bear Misc.FBX','Bear Movement In Place.FBX','Bear Movement.FBX'],
 }) {
     const controlsRef = useRef()
     const cameraRef = useRef()
@@ -33,6 +33,7 @@ export default function ModelViewer({
     const [wireframeColor, setWireframeColor] = useState(null)
     const [showRenderSettings, setShowRenderSettings] = useState(false)
     const [modelStats, setModelStats] = useState({ vertices: 0, triangles: 0, bones: 0 })
+    const [showStats, setShowStats] = useState(false)
     const [selectedAnimationFile, setSelectedAnimationFile] = useState(animationUrls[0])
     const [duration, setDuration] = useState(1)
     const [progress, setProgress] = useState(0)
@@ -198,6 +199,11 @@ export default function ModelViewer({
                     </svg>
                 </button>
                 <div className="spacer"></div>
+                <button className="stats-button"
+                        onClick={() => setShowStats(!showStats)}
+                        title="数据显示">
+                        stats
+                </button>
                 <button className="download-button" title="下载">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
@@ -223,11 +229,13 @@ export default function ModelViewer({
                 />
             )}
             {/* 数据显示 */}
+            {showStats &&(
             <StatPanel
                 modelStats={modelStats}
                 showBonesCount={modelHasBones}
 
             />
+            )}
             {/* 动画播放栏 */}
             {hasAnimations && (
                 <AnimationControlPanel
