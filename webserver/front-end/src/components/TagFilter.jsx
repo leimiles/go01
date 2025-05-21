@@ -31,7 +31,7 @@ function TagFilter({ selectedTags, onSelectTags }) {
                         className={`tag-item ${selectedTags.includes(tag) ? 'selected' : ''}`}
                         onClick={() => handleTagClick(tag)}
                     >
-                        {tag}
+                        {tag.length > 4 ? tag.slice(0, 4) + '…' : tag}
                     </div>
                 ))}
             </div>

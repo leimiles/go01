@@ -111,3 +111,23 @@
         border-top: 1px solid #333;
     }
 }
+
+/* 深色主题自定义滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+    background: #222;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+body, .content-page, .content-sidebar, .content-main, .content-preview {
+    scrollbar-width: thin;
+    scrollbar-color: #444 #222;
+}
