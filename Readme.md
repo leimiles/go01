@@ -89,3 +89,10 @@ assets-3d/
 ## 许可证
 
 此项目基于 [MIT License](LICENSE)。
+
+## 获得本机 ip
+
+1. mac：
+    ```bash
+    ifconfig getifaddr en0
+    ```
