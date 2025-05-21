@@ -1,6 +1,15 @@
+import { useState } from 'react'
 import '../css/AssetGrid.css'
 
 function AssetGrid({ assets, selectedAsset, onSelectAsset }) {
+    // 用对象存储每个 asset 的图片加载失败状态
+    const [imgErrorMap, setImgErrorMap] = useState({})
+
+    // 图片加载失败时的处理
+    const handleImgError = (id) => {
+        setImgErrorMap(prev => ({ ...prev, [id]: true }))
+    }
+
     return (
         <div className="asset-grid">
             {assets.map(asset => (
@@ -10,7 +19,11 @@ function AssetGrid({ assets, selectedAsset, onSelectAsset }) {
                     onClick={() => onSelectAsset(asset)}
                 >
                     <div className="asset-thumbnail">
-                        <img src={asset.thumbnail} alt={asset.name} />
+                        {!imgErrorMap[asset.id] ? (
+                            <img src={asset.thumbnail} onError={() => handleImgError(asset.id)} />
+                        ) : (
+                            <span className="img-error-text">图片加载失败</span>
+                        )}
                     </div>
                     <div className="asset-info">
                         <h3>{asset.name}</h3>
