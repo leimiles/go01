@@ -2,6 +2,8 @@
     width: 100%;
     aspect-ratio: 16/9;
     position: relative;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 /* Three.js画布 */
