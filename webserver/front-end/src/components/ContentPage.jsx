@@ -4,6 +4,7 @@ import CategoryTabs from './CategoryTabs'
 import TagFilter from './TagFilter'
 import AssetGrid from './AssetGrid'
 import { fetchCategories, fetchAssets } from '../services/assetService'
+import AssetComments from './AssetComments'
 
 // 动态导入 ModelViewer
 const ModelViewer = lazy(() => import('./ModelViewer'))
@@ -77,9 +78,16 @@ function ContentPage() {
                 </div>
                 <div className="content-preview">
                     {selectedAsset ? (
-                        <Suspense fallback={<div className="preview-placeholder">加载中...</div>}>
-                            <ModelViewer asset={selectedAsset} />
-                        </Suspense>
+                        <>
+                        <div className="modelviewer-wrapper">
+                            <Suspense fallback={<div className="preview-placeholder">加载中...</div>}>
+                                <ModelViewer asset={selectedAsset} />
+                            </Suspense>
+                        </div>
+                        <div style={{marginTop: '1.5rem'}}>
+                            <AssetComments assetId={selectedAsset.id} />
+                        </div>
+                        </>
                     ) : (
                         <div className="preview-placeholder">
                             请选择一个资产进行预览
