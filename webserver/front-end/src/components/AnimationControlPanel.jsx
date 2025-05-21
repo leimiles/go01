@@ -34,8 +34,8 @@ export default function AnimationControlPanel({
                                 key={file}
                                 className={`animation-item ${selectedAnimationFile === file ? 'selected' : ''}`}
                                 onClick={() => {
-                                    onAnimationSelect(file);
-                                    setShowAnimationDropdown(false);
+                                    onAnimationSelect(file)
+                                    setShowAnimationDropdown(false)
                                 }}
                             >
                                 {file.replace(/\.[^/.]+$/, '')}

@@ -7,6 +7,9 @@ body {
 }
 
 .container {
+  max-width:80vw;
+  aspect-ratio: 4 / 3;
+  height:70vh;
   text-align: center;
 }
 

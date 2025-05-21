@@ -7,6 +7,7 @@
     font-size: 13px;
     transition: all 0.2s;
     background-color: transparent;
+    color: #b9b9b9;
 }
 
 .animation-item:hover {
@@ -34,7 +35,7 @@
     padding: 12px 20px;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 10;
+    z-index: 20;
     font-size: 14px;
     border: 1px solid #404040;
 }
@@ -135,7 +136,7 @@
     border: 1px solid #404040;
     border-radius: 4px;
     z-index: 20;
-    max-height: 200px;
+    max-height: 150px;
     overflow-y: auto;
     margin-bottom: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

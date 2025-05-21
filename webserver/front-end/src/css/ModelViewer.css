@@ -1,14 +1,7 @@
 .modelviewer-container {
     width: 100%;
     aspect-ratio: 16/9;
-    max-height: 80vh;
     position: relative;
-    overflow: hidden;
-    background: #1a1a1a;
-    font-size: 14px;
-    line-height: 1.4;
-    box-sizing: border-box;
-    color: #e0e0e0;
 }
 
 /* Three.js画布 */
@@ -31,6 +24,7 @@
 
 .settings-button,
 .reset-view-button,
+.stats-button,
 .download-button,
 .close-button {
     width: 24px;
@@ -46,12 +40,28 @@
 
 .settings-button:hover,
 .reset-view-button:hover,
+.stats-button:hover,
 .download-button:hover {
     color: #ffffff;
 }
 
 .spacer {
     flex-grow: 1;
+}
+
+/* 数据显示按钮 */
+.stats-button {
+    width: 42px;
+    height: 24px;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e0e0e0;
+    font-size: 16px;
+    padding: 5px;
+    transform: translateY(-12%);
+    transition: color 0.2s;
 }
 
 /* 关闭按钮 */

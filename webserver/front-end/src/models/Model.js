@@ -4,6 +4,8 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { TGALoader } from 'three/examples/jsm/loaders/TGALoader'
 
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils'
+
 import * as THREE from 'three'
 
 export default class Model {
@@ -11,9 +13,12 @@ export default class Model {
         this.modelRoot = null
         this.initLoaderDefaults()
         this.stats = {
+            vertexAttributes: {},
             vertices: 0,
+            indices: 0,
             triangles: 0,
-            bones: 0
+            bones: 0,
+            submeshes: 0
         }
         this.animationUrls = animationUrls
         this.isLoadingAnimationAsModel = false
@@ -22,7 +27,7 @@ export default class Model {
     // 路径/TGA处理器
     initLoaderDefaults() {
         this.loaderSettings = {
-            basePath: '/Bear/',
+            basePath: '',
             texturePath: 'textures/',
             animationPath: 'animations/',
             tgaHandler: new TGALoader()
@@ -63,6 +68,7 @@ export default class Model {
                 throw new Error(`Unsupported format: ${ext}`)
             }
             const hasBones = this.calculateStats(result.model)
+            this.postProcessModel(result.model)
             // 返回模型和统计信息
             return {
                 model: result.model,
@@ -98,8 +104,6 @@ export default class Model {
         const object = await new Promise((resolve, reject) => {
             objLoader.load(url, resolve, undefined, reject)
         })
-
-        this.postProcessModel(object)
         return { model: object }
     }
 
@@ -116,7 +120,6 @@ export default class Model {
         const gltf = await new Promise((resolve, reject) => {
             gltfLoader.load(url, resolve, undefined, reject)
         })
-        this.postProcessModel(gltf.scene)
         return { model: gltf.scene }
     }
 
@@ -134,8 +137,6 @@ export default class Model {
         const object = await new Promise((resolve, reject) => {
             fbxLoader.load(url, resolve, undefined, reject)
         })
-
-        this.postProcessModel(object)
         return { model: object }
     }
 
@@ -229,9 +230,11 @@ export default class Model {
             }
         })
     }
+
     // 重置统计
     resetStats() {
         this.stats = {
+            vertexAttributes: {},
             vertices: 0,
             triangles: 0,
             bones: 0
@@ -240,30 +243,68 @@ export default class Model {
 
     // 计算模型统计信息
     calculateStats(object) {
-        let bonesCount = 0
+        const stats = {
+            vertexAttributes: {},
+            vertices: 0,
+            indices: 0,
+            triangles: 0,
+            bones: 0,
+            submeshes: 0
+        }
+        let hasBones = false
         object.traverse((child) => {
             if (child.isMesh && child.geometry) {
-                const geometry = child.geometry
+                let geometry = child.geometry
+                if (!child.geometry.index) {
+                    const merged = mergeVertices(child.geometry)
+                    merged.computeTangents()
+                    geometry = merged
+                }
+
+                for (const [name, attr] of Object.entries(geometry.attributes)) {
+                    if (!stats.vertexAttributes[name]) {
+                        const type = attr.array.constructor.name.replace('Array', '')
+                        const bytesPerElement = attr.array.BYTES_PER_ELEMENT
+                        const bytesTotal = attr.itemSize * bytesPerElement
+
+                        stats.vertexAttributes[name] = {
+                            type: `${type}x${attr.itemSize}(${bytesTotal}bytes)`,
+                        }
+                    }
+                }
 
                 // 统计顶点数
                 if (geometry.attributes.position) {
-                    this.stats.vertices += geometry.attributes.position.count
+                    stats.vertices += geometry.attributes.position.count
+                }
+
+                // 统计索引数
+                if (geometry.index) {
+                    stats.indices += geometry.index.count
                 }
 
                 // 统计三角面数
                 if (geometry.index) {
-                    this.stats.triangles += geometry.index.count / 3
+                    stats.triangles += geometry.index.count / 3
                 } else {
-                    this.stats.triangles += geometry.attributes.position.count / 3
+                    stats.triangles += geometry.attributes.position.count / 3
+                }
+
+                // 统计子网格数量
+                if (Array.isArray(child.material)) {
+                    stats.submeshes += child.material.length
+                } else {
+                    stats.submeshes += 1
                 }
             }
 
             if (child.isBone) {
-                bonesCount++
+                stats.bones++
+                hasBones = true
             }
         })
-        this.stats.bones = bonesCount
-        return bonesCount > 0
+        this.stats = stats
+        return hasBones
 
     }
 
