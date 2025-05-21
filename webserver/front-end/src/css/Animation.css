@@ -26,7 +26,7 @@
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
+    width: calc(100% - 60px);
     min-width: 300px;
     display: flex;
     align-items: center;
@@ -72,6 +72,7 @@
     border-radius: 3px;
     outline: none;
     transition: height 0.2s;
+    margin: 0 10px;
 }
 
 .progress-slider:hover {
@@ -97,7 +98,7 @@
 .animation-dropdown-container {
     order: 3;
     position: relative;
-    margin-right: 0px;
+    margin-right: 10px;
     min-width: 120px;
 }
 
