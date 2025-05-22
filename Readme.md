@@ -96,3 +96,10 @@ assets-3d/
     ```bash
     ipconfig getifaddr en0
     ```
+
+2. 启动 nginx
+    ```bash
+    brew services stop nginx
+    nginx -c /Users/zhulei/Projects/go01/webserver/nginx.conf
+    brew services start nginx
+    ```
