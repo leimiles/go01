@@ -14,6 +14,12 @@ assets-3d 是一个基于 Go + React + Three.js 的项目框架，旨在提供�
 - 权限管理，设置管理员权限，以用于维护后台和数据
 - 并发访问，支持多用户同时浏览，下载
 
+## 数据单元以及应用
+- 数据单元是一个文件夹，其中包含与该数据单元相关的所有文件
+- 数据单元位于一个网络路径，例如 webgl.sofunny.io/animals/bear/
+- 数据单元的信息来源于数据单元目录中的 .json 文件，其中包含数据单元的名称 name；数据单元的文件列表 content(包含 model，animations，textures)；数据单元的标签 tags
+- 数据单元所在的目录，包含一个关于该类型数据单元目录的描述，例如 webgl.sofunny.io/animals/bear 这个路径，在 animals 文件夹下，有一个 animals.json，其中也包含一个 name: 小动物
+
 ## 安装
 
 在开始之前，请确保已安装 Go。可以通过以下步骤安装：
