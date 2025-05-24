@@ -13,7 +13,10 @@ func SetupRouter() *gin.Engine {
 
 	// 配置 CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // 允许所有源访问
+		AllowOrigins: []string{
+			"http://localhost:8080", // 后端服务
+			"http://localhost:5173", // Vite 开发服务器
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
