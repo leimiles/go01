@@ -1,9 +1,9 @@
 package main
 
 import (
-	"go01/webserver/api/routes"
-	"go01/webserver/config"
-	"go01/webserver/database"
+	"go01/back-end/api/routes"
+	"go01/back-end/config"
+	"go01/back-end/database"
 	"log"
 )
 

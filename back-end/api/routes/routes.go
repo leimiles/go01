@@ -30,7 +30,7 @@ func SetupRouter() *gin.Engine {
 		// 健康检查
 		api.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{
-				"message": "pong",
+				"message": "pong2",
 			})
 		})
 

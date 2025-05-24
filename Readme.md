@@ -53,10 +53,10 @@ assets-3d 是一个基于 Go + React + Three.js 的项目框架，旨在提供�
     ```
     npm run build
     ```
-2. 清空 webserver 下 public 文件夹中的内容，将前端工程下的 public 内容复制过去
+2. 清空 back-end 下 public 文件夹中的内容，将前端工程下的 public 内容复制过去
     ```
-    rm -rf ../public/*
-    cp -r dist/* ../public/
+    rm -rf ../web/public/*
+    cp -r dist/* ../web/public/
     ```
 
 ## 快速开始
@@ -81,11 +81,14 @@ assets-3d 是一个基于 Go + React + Three.js 的项目框架，旨在提供�
 ## 目录结构
 
 ```
-assets-3d/
-├── webserver/          # 后端服务
-├── front-end/          # 前端框架
-├── public/             # web 构建目录
-├── main.go             # 主入口
+go01/
+├── back-end/          # 后端服务
+├── front-end/         # 前端框架
+├── web/              # web 构建目录
+├── go.mod            # Go 模块定义文件
+├── go.sum            # Go 依赖版本锁定文件
+├── .gitignore        # Git 忽略文件配置
+└── Readme.md         # 项目说明文档
 ```
 
 ## 贡献
@@ -106,6 +109,6 @@ assets-3d/
 2. 启动 nginx
     ```bash
     brew services stop nginx
-    nginx -c /Users/zhulei/Projects/go01/webserver/nginx.conf
+    nginx -c /Users/zhulei/Projects/go01/web/nginx.conf
     brew services start nginx
     ```
