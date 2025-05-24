@@ -1,12 +1,12 @@
 // API 基础 URL
-const API_BASE_URL = 'http://localhost:8888/api';
+const API_BASE_URL = '/api';
 
 // API 请求函数
 export const api = {
   // 测试 API
   ping: async () => {
     const response = await fetch(`${API_BASE_URL}/ping`);
-    //console.log('hello');
+    console.log('hello');
     return response.json();
   },
   

@@ -45,7 +45,7 @@ func main() {
 
 	// 启动服务器
 	log.Println("Server started at :8888")
-	if err := r.Run(":8888"); err != nil {
+	if err := r.Run("0.0.0.0:8888"); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }
