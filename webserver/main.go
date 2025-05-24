@@ -1,10 +1,10 @@
 package main
 
 import (
+	"go01/webserver/api/routes"
 	"go01/webserver/config"
 	"go01/webserver/database"
 	"log"
-	"net/http"
 )
 
 func main() {
@@ -40,13 +40,12 @@ func main() {
 		log.Printf("数据库版本: %s\n", version)
 	}
 
-	// 设置静态文件服务
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/", fs)
+	// 设置路由
+	r := routes.SetupRouter()
 
 	// 启动服务器
-	log.Println("Server started at :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal("ListenAndServe: ", err)
+	log.Println("Server started at :8888")
+	if err := r.Run(":8888"); err != nil {
+		log.Fatal("Failed to start server:", err)
 	}
 }

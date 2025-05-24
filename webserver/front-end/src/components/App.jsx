@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import '../css/App.css'
 import Footer from './Footer'
 import Welcome from './Welcome'
+import ApiTester from './ApiTester'
 const ModelViewer = lazy(() => import('./ModelViewer'))
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       </Suspense>
       <Welcome />
       <Footer />
+      <ApiTester />
     </div>
   )
 }

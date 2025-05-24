@@ -11,6 +11,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/content" element={<ContentPage />} />
+        <Route path="/api/*" element={null} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

@@ -1,0 +1,31 @@
+.api-tester-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.api-tester-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.api-tester-button:hover {
+  background-color: #388e3c;
+}
+
+.api-tester-result {
+  margin-top: 10px;
+}
+
+.api-tester-pre {
+  background-color: #f5f5f5;
+  color: #222;
+  padding: 10px;
+  border-radius: 4px;
+  overflow: auto;
+} 
